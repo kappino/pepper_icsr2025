@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Pepper Infotainment</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      overflow: hidden; /* lock scroll */
+
+    }
+
+    h1, h2, p {
+      margin: 0.5em 0;
+    }
+
+    /* 🔹 Home grid */
+    #home {
+      display: flex;
+      flex-wrap: wrap;       /* manda a capo se non ci sta nella riga */
+      justify-content: center;
+      align-items: flex-start;
+      gap: 15px;
+      padding: 20px;
+      height: 100%;
+      box-sizing: border-box;
+      overflow-y: auto;      /* scroll verticale se troppe */
+    }
+
+    .icon-card {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      width: 150px;
+      text-align: center;
+      margin-left: 45px;
+      margin-right: 45px;
+      margin-top: auto;
+      margin-bottom: auto;
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+      transition: transform 0.2s;
+      flex: 0 0 auto;        /* 🔹 evita che si deformino */
+    }
+
+    .icon-card:hover {
+      transform: scale(1.05);
+    }
+    .icon-card img {
+      width: 100%;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 12px 12px 0 0;
+    }
+    .icon-card p {
+      font-weight: bold;
+      padding: 5px;
+    }
+
+
+
+    .question-box {
+      background: #eef5ff;
+      border-left: 4px solid #007BFF;
+      margin: 10px auto;
+      padding: 10px;
+      width: 90%;
+      max-width: 500px;
+      text-align: left;
+    }
+
+    .answers button {
+      display: block;
+      margin: 5px auto;
+      padding: 10px;
+      width: 90%;
+      border: none;
+      border-radius: 5px;
+      background: #007BFF;
+      color: white;
+      font-size: 14px;
+    }
+
+    .back-btn {
+      margin-top: 15px;
+      padding: 10px;
+      background: #555;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+#scene {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+  overflow-y: auto;
+}
+
+#scene img {
+  max-width: 80vw;
+  max-height: 40vh;
+  object-fit: contain;
+  border-radius: 10px;
+  margin: 10px 0;
+}
+
+#scene video.fullscreen {
+  position: fixed;   /* si stacca dal layout */
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover; /* riempie lo schermo */
+  z-index: 9999;     /* sopra a tutto */
+  border-radius: 0;  /* niente bordi */
+}
+
+.correct { background: #28a745 !important; }
+.wrong { background: #dc3545 !important; }
+  </style>
+</head>
+<body>
+
+  <!-- 🔹 Home Grid -->
+  <div id="home">
+    <div class="icon-card" data-card="Parthenope">
+      <img src="images/parthenope2.png" alt="Parthenope">
+      <p>UniParthenope</p>
+    </div>
+    <div class="icon-card" data-card="Brain Lab Team">
+      <img src="images/brainlab.png" alt="Brain Lab Team">
+      <p>Brain Lab Team</p>
+    </div>
+    <div class="icon-card" data-card="ICSR 2025">
+      <img src="images/icsr.png" alt="ICSR 2025">
+      <p>ICSR 2025</p>
+    </div>    
+    <div class="icon-card" data-card="Social Events">
+      <img src="images/social_events.png" alt="Social Events">
+      <p>Social Events</p>
+    </div>
+    <div class="icon-card" data-card="Napoli">
+      <img src="images/napoli.jpg" alt="Napoli">
+      <p>Napoli</p>
+    </div>
+    <div class="icon-card" data-card="Future of Robotics">
+      <img src="images/future_robotics.png" alt="Future of Robotics">
+      <p>Future of Robotics</p>
+    </div>
+  </div>
+
+  <!-- 🔹 Scene (GIF, Video, Questions) -->
+  <div id="scene">
+    <h2 id="sceneTitle"></h2>
+    <img id="sceneGIF" src="" alt="Topic GIF" style="display: none;">
+    <video id="sceneVideo" controls autoplay style="display: none;">
+      <source src="" type="video/mp4">
+    </video>
+
+    <div id="questionBox" class="question-box" style="display: none;"></div>
+    <div id="answers" class="answers"></div>
+    <div id="thankYou" style="display: none;">Thank you for your contribution!</div>
+    <button id="backBtn" class="back-btn" onclick="backToHome()">⬅ Back to Home</button>
+  </div>
+
+  <script>
+    // 🔹 WebSocket with Pepper
+    //var ws = new WebSocket('ws://10.100.10.49:8765/');
+    //var ws = new WebSocket('ws://0.0.0.0:8765/'); // Per test locale
+    var ws = new WebSocket('ws://' + window.location.hostname + ':8765/');
+
+
+
+    var home = document.getElementById("home");
+    var scene = document.getElementById("scene");
+    var sceneGIF = document.getElementById("sceneGIF");
+    var sceneVideo = document.getElementById("sceneVideo");
+    var sceneTitle = document.getElementById("sceneTitle");
+    var questionBox = document.getElementById("questionBox");
+    var answersDiv = document.getElementById("answers");
+    var backBtn = document.getElementById("backBtn");
+
+    // 🔹 Card data
+    var cardData = {
+      "Parthenope": { gif: "images/cdn.gif" },
+      "Brain Lab Team": { gif: "images/brainlab.gif" },
+      "Napoli": { gif: "images/Napoli.gif" },
+      "Castel dell'Ovo": { gif: "images/ovo.gif" },
+      "ICSR 2025": { gif: "images/cdn.gif" },
+      "Social Events": { gif: "images/social_events.gif" },
+      "Future of Robotics": { gif: "images/future_robotics.png" }
+
+
+    };
+
+    // 🔹 Back
+    function backToHome(){
+      home.style.display = "flex";
+      scene.style.display = "none";
+      sceneGIF.style.display = "none";
+      sceneVideo.style.display = "none";
+      sceneVideo.pause();
+      questionBox.style.display = "none";
+      answersDiv.innerHTML = "";
+      thankYou.style.display = "none";
+      backBtn.style.display = "block";
+    }
+
+    // 🔹 Show GIF
+    function showGIF(title, gifSrc){
+      sceneTitle.innerHTML = title;
+      sceneGIF.src = gifSrc;
+      sceneGIF.style.display = "block";
+      sceneVideo.style.display = "none";
+      questionBox.style.display = "none";
+      answersDiv.innerHTML = "";
+    }
+
+    function showVideo(title, videoSrc){
+    // Nascondi gli altri elementi
+    sceneTitle.style.display = "none";
+    sceneGIF.style.display = "none";
+    questionBox.style.display = "none";
+    answersDiv.innerHTML = "";
+    backBtn.style.display = "none";
+
+    // Configura il video
+    var video = sceneVideo;
+    video.src = videoSrc;
+    video.style.display = "block";
+        video.addEventListener('ended', myHandler, false);
+        function myHandler(e) {
+        video.style.display = "none";
+        ws.send(JSON.stringify({ video_ended: data.show_video }));
+        sceneTitle.style.display = "block";
+      }
+    video.classList.add("fullscreen");
+    video.load();
+    video.play().catch(e => console.log("Autoplay failed:", e));
+        
+
+
+    }
+
+    // 🔹 Click cards
+    var cards = document.getElementsByClassName("icon-card");
+    for(var i=0; i<cards.length; i++){
+      cards[i].onclick = function(){
+        var cardName = this.getAttribute("data-card");
+        home.style.display = "none";
+        scene.style.display = "flex";
+
+        if(cardData[cardName].gif) showGIF(cardName, cardData[cardName].gif);
+        else if(cardData[cardName].video) showVideo(cardName, cardData[cardName].video);
+
+        try { ws.send(JSON.stringify({card: cardName})); } catch(e){}
+      }
+    }
+
+    // 🔹 Handle WS messages from Pepper
+    ws.onmessage = function(event){
+      var data = JSON.parse(event.data);
+
+      // Show question
+      if(data.question && data.options){
+        sceneTitle.style.display = "none";
+        backBtn.style.display = "none";
+        questionBox.innerHTML = "<p>" + data.question + "</p>";
+        questionBox.style.display = "block";
+        answersDiv.innerHTML = "";
+        for(var i=0; i<data.options.length; i++){
+          var btn = document.createElement("button");
+          btn.innerHTML = data.options[i];
+          btn.onclick = (function(opt){ 
+            return function(){ 
+              try { ws.send(JSON.stringify({ answer: opt })); } catch(e){}
+              disableAnswers();
+            }; 
+          })(data.options[i]);
+          answersDiv.appendChild(btn);
+        }
+      }
+
+      // Highlight answer
+      if(data.selected && data.correct){
+        var btns = answersDiv.getElementsByTagName("button");
+        for(var i=0; i<btns.length; i++){
+          if(btns[i].innerHTML === data.correct) btns[i].className = "correct";
+          else if(btns[i].innerHTML === data.selected) btns[i].className = "wrong";
+          btns[i].disabled = true;
+        }
+      }
+
+      // Hide question
+      if(data.hide_question){
+        questionBox.innerHTML = "";
+        questionBox.style.display = "none";
+        answersDiv.innerHTML = "";
+        backBtn.style.display = "block";
+      }
+
+      // Show video from server
+      if(data.show_video){
+        showVideo("Video", data.show_video);
+      }
+      if(data.update_poll){
+        thankYou.style.display = "block";
+      }
+    };
+
+    function disableAnswers(){
+      var btns = answersDiv.getElementsByTagName("button");
+      for(var i=0; i<btns.length; i++){ btns[i].disabled = true; }
+    }
+  </script>
+</body>
+</html>
