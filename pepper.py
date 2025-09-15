@@ -14,7 +14,7 @@ PEPPER_PORT = 9559
 scenes = {
     "Parthenope": [
         {"say": "Let me introduce you to the Università degli Studi di Napoli Parthenope, a historic university in Naples. It was founded in nineteen twenty as a Royal Naval Institute. Today, it offers a wide range of programs in computer science, economics, law, engineering, and sports sciences. Let me show you a brief overview of the university."},
-        {"video": "images/parthenope.mp4"},
+        {"video": "videos/parthenope.mp4"},
         {
             "question": "Do you know what the symbol of the Università degli Studi di Napoli Parthenope represents?",
             "options": ["A siren", "An anchor"],
