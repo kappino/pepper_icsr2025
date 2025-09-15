@@ -4,7 +4,7 @@ Questo progetto implementa un sistema di **interazione multimodale con il robot 
 - **Backend in Python** → gestisce la connessione con Pepper e un server WebSocket.
 - **Frontend Web (HTML/JS/CSS)** → interfaccia grafica per visualizzare contenuti multimediali e domande a risposta multipla.
 
-Lo scopo è fornire una piattaforma semplice e interattiva per presentazioni (es. Università Parthenope, eventi ICSR, info turistiche su Napoli) con il supporto di Pepper.
+Lo scopo è fornire una piattaforma semplice e interattiva per presentazioni con il supporto di Pepper.
 
 ---
 
@@ -12,10 +12,10 @@ Lo scopo è fornire una piattaforma semplice e interattiva per presentazioni (es
 
 ### Python
 - Python 3.8+  
-- [qi SDK](http://doc.aldebaran.com/2-5/dev/python/index.html) (per interfaccia con Pepper)  
 - Pacchetti Python:
+- [qi](https://github.com/aldebaran/libqi-python)
 ```bash
-  pip install websockets asyncio
+  pip install websockets asyncio qi
 ````
 
 ### Frontend
@@ -35,7 +35,7 @@ Lo scopo è fornire una piattaforma semplice e interattiva per presentazioni (es
    python3 server.py
    ```
 4. Aprire `index.html` nel browser (sul PC o su un dispositivo connesso alla stessa rete).
-5. Cliccare sulle card per avviare le scene e interagire con Pepper.
+5. Cliccare sulle cards per avviare le scene e interagire con Pepper.
 
 ---
 
