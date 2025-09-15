@@ -1,3 +1,5 @@
+---
+
 # Pepper Infotainment
 
 Questo progetto implementa un sistema di **interazione con il robot Pepper**, combinando:
@@ -14,14 +16,13 @@ L’obiettivo è fornire una piattaforma **semplice, estensibile e interattiva**
 ### Python
 
 * **Python 3.8+**
-
 * Pacchetti necessari:
 
-  ```bash
-  pip install websockets qi
-  ```
-* Libreria `qi`:
-  [qi (libqi-python)](https://github.com/aldebaran/libqi-python) → necessaria per comunicare con Pepper.
+```bash
+pip install websockets qi aiohttp aiofiles
+```
+
+* Libreria `qi` ([libqi-python](https://github.com/aldebaran/libqi-python)) → necessaria per comunicare con Pepper.
 
 ### Frontend
 
@@ -33,25 +34,30 @@ L’obiettivo è fornire una piattaforma **semplice, estensibile e interattiva**
 ## 🚀 Installazione e avvio
 
 1. Clonare o copiare la repository sul proprio computer.
+2. Impostare l’IP di Pepper in `pepper.py`:
 
-2. Impostare l’IP di Pepper in `server.py`:
+```python
+PEPPER_IP = "192.168.1.xxx"
+```
 
-   ```python
-   PEPPER_IP = "192.168.1.xxx"
-   ```
+3. Avviare il **server Pepper + WebSocket**:
 
-3. Avviare il server:
+```bash
+python3 pepper.py
+```
 
-   ```bash
-   python3 server.py
-   ```
+4. Avviare il **server web** per servire `index.html` e i media:
 
-4. Aprire `index.html` in un browser:
+```bash
+python3 server.py
+```
 
-   * sullo stesso PC, oppure
-   * da un altro dispositivo nella stessa rete.
+5. Aprire `index.html` in un browser:
 
-5. Interagire con Pepper cliccando sulle **card** disponibili.
+* sullo stesso PC, oppure
+* da un altro dispositivo nella stessa rete.
+
+6. Interagire con Pepper cliccando sulle **card** disponibili.
 
 ---
 
@@ -59,35 +65,38 @@ L’obiettivo è fornire una piattaforma **semplice, estensibile e interattiva**
 
 ```
 .
-├── server.py       # Backend Python: gestisce Pepper + WebSocket server
+├── pepper.py       # Gestione Pepper + server WebSocket
+├── server.py       # Server web per frontend (HTML, immagini, video)
 ├── poll.json       # File per salvare i risultati dei sondaggi
 ├── index.html      # Frontend Web (HTML, CSS, JS)
-├── images/         # Risorse grafiche (icone, GIF, foto, ecc.)
-└── videos/         # Video utilizzati nelle scene
+├── images/         # Risorse grafiche (icone, GIF, foto, video)
+└── videos/         # Video utilizzati nelle scene (opzionale)
 ```
 
 ---
 
 ## ⚙️ Funzionalità attuali
 
-* Gestione di **scene predefinite** (Parthenope, Brain Lab Team, Napoli, ICSR, Social Events, Future of Robotics).
+* Gestione di **scene predefinite**:
+  Parthenope, Brain Lab Team, Napoli, ICSR, Social Events, Future of Robotics.
 * Supporto per:
 
-  * Parlato (TTS + AnimatedSpeech di Pepper).
-  * Immagini e video.
-  * Domande a risposta multipla con feedback immediato.
-* **Sondaggio persistente** per *Future of Robotics*, con salvataggio in `poll.json`.
+  * Parlato (TTS + AnimatedSpeech di Pepper)
+  * Immagini e video
+  * Domande a risposta multipla con feedback immediato
+* **Sondaggio persistente** per *Future of Robotics*, salvato in `poll.json`.
 * Interfaccia grafica web con griglia di card interattive.
+* Streaming video con supporto agli header HTTP Range (necessario per `<video>`).
 
 ---
 
 ## 🔮 Possibili upgrade futuri
 
-* **Protocollo WebSocket più strutturato**: introdurre un campo `type` (`scene`, `question`, `video`, ecc.) nei messaggi.
-* **Separazione contenuti/logica**: spostare le scene in un file JSON esterno, così da poterle aggiornare senza modificare il codice.
-* **UI migliorata**: rendere l’interfaccia responsive e modulare, con un framework leggero.
-* **App mobile / PWA**: trasformare il frontend in una Progressive Web App o in apk.
-* **Multi-utente**: supportare più tablet/browser collegati contemporaneamente a Pepper.
+* **Protocollo WebSocket più strutturato**: aggiungere un campo `type` (`scene`, `question`, `video`) nei messaggi.
+* **Separazione contenuti/logica**: spostare le scene in un file JSON esterno per facilitare aggiornamenti.
+* **UI migliorata**: rendere l’interfaccia responsive e modulare, con framework leggero.
+* **App mobile / PWA**: trasformare il frontend in una Progressive Web App o pacchettizzarlo come apk.
+* **Multi-utente / multi-device**: gestire più tablet/browser collegati contemporaneamente.
 
 ---
 
@@ -95,3 +104,5 @@ L’obiettivo è fornire una piattaforma **semplice, estensibile e interattiva**
 
 Progetto sviluppato da **Crescenzo Esposito** – Università degli Studi di Napoli *Parthenope*.
 **Versione:** 1.0 (Settembre 2025)
+
+---
