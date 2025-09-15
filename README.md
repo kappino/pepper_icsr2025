@@ -1,5 +1,3 @@
----
-
 # Pepper Infotainment
 
 Questo progetto implementa un sistema di **interazione con il robot Pepper**, combinando:
@@ -104,5 +102,3 @@ python3 server.py
 
 Progetto sviluppato da **Crescenzo Esposito** – Università degli Studi di Napoli *Parthenope*.
 **Versione:** 1.0 (Settembre 2025)
-
----
